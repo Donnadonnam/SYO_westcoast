@@ -15,10 +15,10 @@ public class Robot extends TimedRobot {
   private DifferentialDrive m_myRobot;
   private Joystick m_stick;
 
-  private int FRONT_LEFT_MOTOR_PORT = 4;
-  private int REAR_LEFT_MOTOR_PORT = 1;
-  private int FRONT_RIGHT_MOTOR_PORT = 2;
-  private int REAR_RIGHT_MOTOR_PORT = 3;
+  private int FRONT_LEFT_MOTOR_PORT = 3;
+  private int REAR_LEFT_MOTOR_PORT = 4;
+  private int FRONT_RIGHT_MOTOR_PORT = 1;
+  private int REAR_RIGHT_MOTOR_PORT = 2;
 
   private CANSparkMax m_frontleftMotor;
   private CANSparkMax m_rearleftMotor;
