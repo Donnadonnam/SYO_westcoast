@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
   }
 
   public double getDistance() {
-    return m_navx.getDisplacementY();
+    return m_navx.getDisplacementX();
   }
 
   public double getHeading() {
