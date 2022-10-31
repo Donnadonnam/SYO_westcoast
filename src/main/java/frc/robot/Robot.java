@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
 
 public class Robot extends TimedRobot {
   private DifferentialDrive m_myRobot;
@@ -27,6 +29,8 @@ public class Robot extends TimedRobot {
   
   private MotorControllerGroup m_leftMotors;
   private MotorControllerGroup m_rightMotors;
+
+  private AHRS m_navx;
   
   @Override
   public void robotInit() {
@@ -40,12 +44,63 @@ public class Robot extends TimedRobot {
     
     m_leftMotors.setInverted(true);
 
+    m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
+    m_navx.zeroYaw();
+    m_navx.resetDisplacement();
+
     m_myRobot = new DifferentialDrive(m_leftMotors, m_rightMotors);
     m_stick = new Joystick(0);
   }
 
   @Override
+  public void autonomousInit() {
+    // Example Movement
+    move(1.5);
+    turn(-30);
+    move(-1.5);
+    turn(30);
+  }
+
+  @Override
   public void teleopPeriodic() {
     m_myRobot.arcadeDrive(-m_stick.getRawAxis(1), m_stick.getRawAxis(4)*0.6);
+  }
+
+  public double getDistance() {
+    return m_navx.getDisplacementY();
+  }
+
+  public double getHeading() {
+    return m_navx.getAngle();
+  }
+
+  public void move(double meters) {
+    m_navx.resetDisplacement();
+    if (meters > 0) {
+      while (getDistance() < meters) {
+        m_myRobot.arcadeDrive(0.5, 0);
+      }
+    }
+    if (meters < 0) {
+      while (getDistance() > meters) {
+        m_myRobot.arcadeDrive(-0.5, 0);
+      }
+    }
+    m_myRobot.arcadeDrive(0, 0);
+  }
+
+  public void turn(double degrees) {
+    m_navx.zeroYaw();
+    if (degrees > 0) {
+      while (getHeading() < degrees) {
+        m_myRobot.arcadeDrive(0, -0.5);
+      }
+    }
+    if (degrees < 0) {
+      while (getHeading() > degrees) {
+        m_myRobot.arcadeDrive(0, 0.5);
+      }
+    }
+    m_myRobot.arcadeDrive(0, 0);
   }
 }
