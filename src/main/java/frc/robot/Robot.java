@@ -6,12 +6,14 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.SPI;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
   private DifferentialDrive m_myRobot;
@@ -62,8 +64,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void teleopInit() {
+    m_myRobot.arcadeDrive(0, 0);
+  }
+
+  @Override
   public void teleopPeriodic() {
     m_myRobot.arcadeDrive(-m_stick.getRawAxis(1), m_stick.getRawAxis(4)*0.6);
+    SmartDashboard.putNumber("Displacement", m_navx.getDisplacementX());
   }
 
   public double getDistance() {
@@ -77,13 +85,15 @@ public class Robot extends TimedRobot {
   public void move(double meters) {
     m_navx.resetDisplacement();
     if (meters > 0) {
-      while (getDistance() < meters) {
-        m_myRobot.arcadeDrive(0.5, 0);
+      m_myRobot.arcadeDrive(0.5, 0);
+      while (getDistance() < meters && isAutonomousEnabled()) {
+        Timer.delay(0.1);
       }
     }
     if (meters < 0) {
-      while (getDistance() > meters) {
-        m_myRobot.arcadeDrive(-0.5, 0);
+      m_myRobot.arcadeDrive(-0.5, 0);
+      while (getDistance() > meters && isAutonomousEnabled()) {
+        Timer.delay(0.1);
       }
     }
     m_myRobot.arcadeDrive(0, 0);
@@ -92,13 +102,15 @@ public class Robot extends TimedRobot {
   public void turn(double degrees) {
     m_navx.zeroYaw();
     if (degrees > 0) {
-      while (getHeading() < degrees) {
-        m_myRobot.arcadeDrive(0, -0.5);
+      m_myRobot.arcadeDrive(0, -0.5);
+      while (getHeading() < degrees && isAutonomousEnabled()) {
+        Timer.delay(0.1);
       }
     }
     if (degrees < 0) {
-      while (getHeading() > degrees) {
-        m_myRobot.arcadeDrive(0, 0.5);
+      m_myRobot.arcadeDrive(0, 0.5);
+      while (getHeading() > degrees && isAutonomousEnabled()) {
+        Timer.delay(0.1);
       }
     }
     m_myRobot.arcadeDrive(0, 0);
