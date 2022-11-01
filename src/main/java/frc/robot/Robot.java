@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
   }
 
   public double getDistance() {
-    return m_navx.getDisplacementX();
+    return -m_navx.getDisplacementX();
   }
 
   public double getHeading() {
@@ -108,13 +108,13 @@ public class Robot extends TimedRobot {
     if (degrees > 0) {
       while (getHeading() < degrees && isAutonomousEnabled()) {
         SmartDashboard.putNumber("Angle", getHeading());
-        m_myRobot.arcadeDrive(0, 0.5);
+        m_myRobot.arcadeDrive(0, 0.4);
       }
     }
     if (degrees < 0) {   
       while (getHeading() > degrees && isAutonomousEnabled()) {
         SmartDashboard.putNumber("Angle", getHeading());
-        m_myRobot.arcadeDrive(0, -0.5);
+        m_myRobot.arcadeDrive(0, -0.4);
       }
     }
     m_myRobot.arcadeDrive(0, 0);
