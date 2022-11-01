@@ -102,13 +102,13 @@ public class Robot extends TimedRobot {
   public void turn(double degrees) {
     m_navx.zeroYaw();
     if (degrees > 0) {
-      m_myRobot.arcadeDrive(0, -0.5);
+      m_myRobot.arcadeDrive(0, 0.5);
       while (getHeading() < degrees && isAutonomousEnabled()) {
         Timer.delay(0.1);
       }
     }
     if (degrees < 0) {
-      m_myRobot.arcadeDrive(0, 0.5);
+      m_myRobot.arcadeDrive(0, -0.5);
       while (getHeading() > degrees && isAutonomousEnabled()) {
         Timer.delay(0.1);
       }
