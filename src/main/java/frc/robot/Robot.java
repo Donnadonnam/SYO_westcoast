@@ -47,7 +47,12 @@ public class Robot extends TimedRobot {
     m_leftMotors.setInverted(true);
 
     m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
-    m_navx.zeroYaw();
+
+    m_navx.calibrate();
+    while (m_navx.isCalibrating() || !m_navx.isConnected()) {
+      Timer.delay(1);
+    }
+    m_navx.reset();
     m_navx.resetDisplacement();
 
     m_myRobot = new DifferentialDrive(m_leftMotors, m_rightMotors);
@@ -59,8 +64,8 @@ public class Robot extends TimedRobot {
     // Example Movement
     move(1.5);
     turn(-30);
-    move(-1.5);
     turn(30);
+    move(-1.5);
   }
 
   @Override
@@ -71,7 +76,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_myRobot.arcadeDrive(-m_stick.getRawAxis(1), m_stick.getRawAxis(4)*0.6);
-    SmartDashboard.putNumber("Displacement", m_navx.getDisplacementX());
   }
 
   public double getDistance() {
@@ -85,32 +89,32 @@ public class Robot extends TimedRobot {
   public void move(double meters) {
     m_navx.resetDisplacement();
     if (meters > 0) {
-      m_myRobot.arcadeDrive(0.5, 0);
       while (getDistance() < meters && isAutonomousEnabled()) {
-        Timer.delay(0.1);
+        SmartDashboard.putNumber("Displacement", getDistance());
+        m_myRobot.arcadeDrive(0.5, 0);
       }
     }
-    if (meters < 0) {
-      m_myRobot.arcadeDrive(-0.5, 0);
+    if (meters < 0) {  
       while (getDistance() > meters && isAutonomousEnabled()) {
-        Timer.delay(0.1);
+        SmartDashboard.putNumber("Displacement", getDistance());
+        m_myRobot.arcadeDrive(-0.5, 0);
       }
     }
     m_myRobot.arcadeDrive(0, 0);
   }
 
   public void turn(double degrees) {
-    m_navx.zeroYaw();
+    m_navx.reset();
     if (degrees > 0) {
-      m_myRobot.arcadeDrive(0, 0.5);
       while (getHeading() < degrees && isAutonomousEnabled()) {
-        Timer.delay(0.1);
+        SmartDashboard.putNumber("Angle", getHeading());
+        m_myRobot.arcadeDrive(0, 0.5);
       }
     }
-    if (degrees < 0) {
-      m_myRobot.arcadeDrive(0, -0.5);
+    if (degrees < 0) {   
       while (getHeading() > degrees && isAutonomousEnabled()) {
-        Timer.delay(0.1);
+        SmartDashboard.putNumber("Angle", getHeading());
+        m_myRobot.arcadeDrive(0, -0.5);
       }
     }
     m_myRobot.arcadeDrive(0, 0);
