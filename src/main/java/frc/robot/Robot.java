@@ -54,8 +54,6 @@ public class Robot extends TimedRobot {
     while (m_navx.isCalibrating() || !m_navx.isConnected()) {
       Timer.delay(1);
     }
-    m_navx.reset();
-    m_navx.resetDisplacement();
 
     m_myRobot = new DifferentialDrive(m_leftMotors, m_rightMotors);
     m_stick = new Joystick(0);
@@ -63,6 +61,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    m_navx.reset();
+    m_navx.resetDisplacement();
+    
     // Example Movement
     move(1.5, 0.5);
     turn(-30, 0.35);
@@ -78,10 +79,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_navx.reset();
+    m_navx.resetDisplacement();
     m_myRobot.arcadeDrive(0, 0);
   }
 
-  @Override
+  @Override 
   public void teleopPeriodic() {
     m_myRobot.arcadeDrive(-m_stick.getRawAxis(1), m_stick.getRawAxis(4)*0.6);
     SmartDashboard.putNumber("Displacement", getDistance());
