@@ -33,6 +33,8 @@ public class Robot extends TimedRobot {
   private MotorControllerGroup m_rightMotors;
 
   private AHRS m_navx;
+  private double currentPosition = 0;
+  private double currentAngle = 0;
   
   @Override
   public void robotInit() {
@@ -62,10 +64,16 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Example Movement
-    move(1.5);
-    turn(-30);
-    turn(30);
-    move(-1.5);
+    move(1.5, 0.5);
+    turn(-30, 0.35);
+    turn(30, 0.35);
+    move(-1.5, 0.5);
+  }
+
+  @Override
+  public void autonomousPeriodic() {
+    SmartDashboard.putNumber("Displacement", getDistance());
+    SmartDashboard.putNumber("Angle", getHeading());
   }
 
   @Override
@@ -76,47 +84,52 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_myRobot.arcadeDrive(-m_stick.getRawAxis(1), m_stick.getRawAxis(4)*0.6);
+    SmartDashboard.putNumber("Displacement", getDistance());
+    SmartDashboard.putNumber("Angle", getHeading());
   }
 
   public double getDistance() {
-    return -m_navx.getDisplacementX();
+    return m_navx.getDisplacementX();
   }
 
   public double getHeading() {
     return m_navx.getAngle();
   }
 
-  public void move(double meters) {
-    m_navx.resetDisplacement();
+  public void move(double meters, double power) {
     if (meters > 0) {
-      while (getDistance() < meters && isAutonomousEnabled()) {
-        SmartDashboard.putNumber("Displacement", getDistance());
-        m_myRobot.arcadeDrive(0.5, 0);
+      while (getDistance() < meters + currentPosition && isAutonomousEnabled()) {
+        m_myRobot.arcadeDrive(power, 0);
       }
     }
     if (meters < 0) {  
-      while (getDistance() > meters && isAutonomousEnabled()) {
-        SmartDashboard.putNumber("Displacement", getDistance());
-        m_myRobot.arcadeDrive(-0.5, 0);
+      while (getDistance() > meters + currentPosition && isAutonomousEnabled()) {
+        m_myRobot.arcadeDrive(-power, 0);
       }
     }
     m_myRobot.arcadeDrive(0, 0);
+    currentPosition = getDistance();
   }
 
-  public void turn(double degrees) {
-    m_navx.reset();
+  public void turn(double degrees, double power) {
     if (degrees > 0) {
-      while (getHeading() < degrees && isAutonomousEnabled()) {
-        SmartDashboard.putNumber("Angle", getHeading());
-        m_myRobot.arcadeDrive(0, 0.4);
+      while (getHeading() < degrees + currentAngle && isAutonomousEnabled()) {
+        m_myRobot.arcadeDrive(0, power);
       }
     }
     if (degrees < 0) {   
-      while (getHeading() > degrees && isAutonomousEnabled()) {
-        SmartDashboard.putNumber("Angle", getHeading());
-        m_myRobot.arcadeDrive(0, -0.4);
+      while (getHeading() > degrees + currentAngle && isAutonomousEnabled()) {
+        m_myRobot.arcadeDrive(0, -power);
       }
     }
     m_myRobot.arcadeDrive(0, 0);
+    currentAngle = getHeading();
+  }
+
+  public void idle(long ms) {
+    long start = System.currentTimeMillis();
+    while (System.currentTimeMillis() < ms + start) {
+      m_myRobot.arcadeDrive(0, 0);
+    }
   }
 }
