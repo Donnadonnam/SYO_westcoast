@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
   private MotorControllerGroup m_leftMotors;
   private MotorControllerGroup m_rightMotors;
 
-  private AHRS m_navx;
+  //private AHRS m_navx;
   private double currentPosition = 0;
   private double currentAngle = 0;
   
@@ -48,12 +48,14 @@ public class Robot extends TimedRobot {
     
     m_leftMotors.setInverted(true);
 
+    /*
     m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
 
     m_navx.calibrate();
     while (m_navx.isCalibrating() || !m_navx.isConnected()) {
       Timer.delay(1);
     }
+    */
 
     m_myRobot = new DifferentialDrive(m_leftMotors, m_rightMotors);
     m_stick = new Joystick(0);
@@ -61,36 +63,47 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    /*
     m_navx.reset();
     m_navx.resetDisplacement();
-    
+    */
+
     // Example Movement
+    /*
     move(1.5, 0.5);
     turn(-30, 0.35);
     turn(30, 0.35);
     move(-1.5, 0.5);
+    */
   }
 
   @Override
   public void autonomousPeriodic() {
+    /*
     SmartDashboard.putNumber("Displacement", getDistance());
     SmartDashboard.putNumber("Angle", getHeading());
+    */
   }
 
   @Override
   public void teleopInit() {
+    /*
     m_navx.reset();
     m_navx.resetDisplacement();
+    */
     m_myRobot.arcadeDrive(0, 0);
   }
 
   @Override 
   public void teleopPeriodic() {
     m_myRobot.arcadeDrive(-m_stick.getRawAxis(1), m_stick.getRawAxis(4)*0.6);
+    /*
     SmartDashboard.putNumber("Displacement", getDistance());
     SmartDashboard.putNumber("Angle", getHeading());
+    */
   }
 
+  /*
   public double getDistance() {
     return m_navx.getDisplacementX();
   }
@@ -128,6 +141,7 @@ public class Robot extends TimedRobot {
     m_myRobot.arcadeDrive(0, 0);
     currentAngle = getHeading();
   }
+  */
 
   public void idle(long ms) {
     long start = System.currentTimeMillis();
